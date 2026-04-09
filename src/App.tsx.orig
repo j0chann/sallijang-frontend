@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 
 // --- Types ---
-type Page = 'home' | 'seller_home' | 'sales' | 'map' | 'detail' | 'payment' | 'complete' | 'reservations' | 'history' | 'register' | 'my' | 'login' | 'wishlist';
+type Page = 'home' | 'detail' | 'payment' | 'complete' | 'reservations' | 'history' | 'register' | 'my' | 'login' | 'wishlist';
 
 interface Product {
   id: number;
@@ -61,19 +61,16 @@ export default function App() {
         
         {/* Page Routing */}
         <div className={`flex-1 overflow-y-auto ${currentPage !== 'detail' && currentPage !== 'payment' && currentPage !== 'complete' && currentPage !== 'login' ? 'pb-20' : ''}`}>
-          {currentPage === 'login' && <LoginPage onLogin={(role) => { setUserRole(role); navigateTo(role === 'SELLER' ? 'seller_home' : 'home'); }} />}
+          {currentPage === 'login' && <LoginPage onLogin={(role) => { setUserRole(role); navigateTo('home'); }} />}
           {currentPage === 'home' && <HomePage onNavigate={(p: number) => navigateTo('detail', p)} now={now} />}
-          {currentPage === 'seller_home' && <SellerHomePage />}
           {currentPage === 'detail' && <DetailPage product={selectedProduct} onBack={() => navigateTo('home')} onReserve={(qty) => { setOrderQuantity(qty); navigateTo('payment'); }} now={now} />}
           {currentPage === 'payment' && <PaymentPage product={selectedProduct} quantity={orderQuantity} onBack={() => navigateTo('detail')} onComplete={() => navigateTo('complete')} />}
           {currentPage === 'complete' && <CompletePage onNavigate={navigateTo} product={selectedProduct} />}
-          {currentPage === 'reservations' && <ReservationsPage userRole={userRole} />}
+          {currentPage === 'reservations' && <ReservationsPage />}
           {currentPage === 'history' && <HistoryPage onNavigate={navigateTo} />}
           {currentPage === 'register' && <RegisterPage onNavigate={navigateTo} />}
-          {currentPage === 'my' && <MyPage onNavigate={navigateTo} userRole={userRole} />}
+          {currentPage === 'my' && <MyPage onNavigate={navigateTo} />}
           {currentPage === 'wishlist' && <WishlistPage />}
-          {currentPage === 'sales' && <SalesPage onNavigate={navigateTo} />}
-          {currentPage === 'map' && <div className="p-4 pt-20 text-center font-bold">지도 페이지</div>}
         </div>
 
         {/* Bottom Tab Bar */}
@@ -532,12 +529,11 @@ function CompletePage({ onNavigate, product }: { onNavigate: (page: Page) => voi
   )
 }
 
-function ReservationsPage({ userRole }: { userRole?: 'USER' | 'SELLER' }) {
+function ReservationsPage() {
   const [reservations, setReservations] = useState([
-    { id: '#PK-0042', name: '국내산 삼겹살', shop: '망원 정육점', time: '오늘 오후 6~8시', imageUrl: DUMMY_PRODUCTS[0].imageUrl, customer: '마포구 식객님', quantity: 2, price: 7200 },
-    { id: '#PK-0041', name: '오늘 구운 크루아상', shop: '동네 베이커리', time: '오늘 오후 5~6시', imageUrl: DUMMY_PRODUCTS[2].imageUrl, customer: '빵돌이', quantity: 1, price: 2400 }
+    { id: '#PK-0042', name: '국내산 삼겹살', shop: '망원 정육점', time: '오늘 오후 6~8시', imageUrl: DUMMY_PRODUCTS[0].imageUrl },
+    { id: '#PK-0041', name: '오늘 구운 크루아상', shop: '동네 베이커리', time: '오늘 오후 5~6시', imageUrl: DUMMY_PRODUCTS[2].imageUrl }
   ]);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
   const handleCancel = (id: string) => {
     if (window.confirm("정말 취소하겠습니까?")) {
@@ -546,103 +542,6 @@ function ReservationsPage({ userRole }: { userRole?: 'USER' | 'SELLER' }) {
       alert("예약이 취소되었습니다.");
     }
   };
-
-  if (userRole === 'SELLER') {
-    if (selectedOrder) {
-      return (
-        <div className="flex flex-col h-full bg-gray-50">
-          <header className="bg-white p-4 flex items-center sticky top-0 z-10 border-b border-gray-100 shrink-0 shadow-sm">
-            <button onClick={() => setSelectedOrder(null)} className="w-8 h-8 flex items-center text-xl font-bold">←</button>
-            <span className="font-bold text-lg flex-1 text-center pr-8">주문 상세 내역</span>
-          </header>
-          <div className="p-4 flex flex-col gap-4">
-            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-3">
-              <div className="flex justify-between items-center text-sm pb-2 border-b border-gray-50">
-                <span className="font-bold text-gray-500">주문 번호 {selectedOrder.id}</span>
-                <span className="font-bold text-blue-600">픽업 대기중</span>
-              </div>
-              
-              <div className="flex gap-4 items-center py-2">
-                <div className="w-20 h-20 bg-[#FFFBE6] rounded-xl overflow-hidden shrink-0 border border-yellow-100 shadow-sm relative">
-                  <img src={selectedOrder.imageUrl} alt={selectedOrder.name} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex flex-col justify-center flex-1">
-                  <div className="font-extrabold text-[17px] flex items-center gap-1 leading-tight text-gray-900">
-                    {selectedOrder.name}
-                  </div>
-                  <div className="text-gray-500 font-bold mt-1 text-[15px]">
-                    <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md text-[13px] mr-1">{selectedOrder.quantity}개</span> 
-                    <span className="text-gray-900">{(selectedOrder.price * selectedOrder.quantity).toLocaleString()}원</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-4">
-              <h3 className="font-bold text-gray-800">고객 정보</h3>
-              <div className="flex justify-between text-sm items-center">
-                <span className="font-bold text-gray-500">닉네임</span>
-                <span className="font-bold text-gray-900 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">{selectedOrder.customer}</span>
-              </div>
-              <div className="flex justify-between text-sm items-center">
-                <span className="font-bold text-gray-500">픽업 예정 시간</span>
-                <span className="font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">{selectedOrder.time}</span>
-              </div>
-            </div>
-            
-            <div className="flex flex-col gap-3 mt-4">
-               <button onClick={() => { alert('픽업 완료 처리되었습니다.'); setSelectedOrder(null); setReservations(prev => prev.filter(r => r.id !== selectedOrder.id)); }} className="w-full bg-[#FFE400] text-black font-extrabold text-lg py-4 rounded-xl hover:bg-yellow-400 active:scale-95 transition-transform shadow-sm">
-                 픽업 완료 처리하기
-               </button>
-               <button onClick={() => setSelectedOrder(null)} className="w-full bg-white border-2 border-gray-200 text-gray-700 font-bold py-4 rounded-xl active:scale-95 transition-transform shadow-sm">
-                 목록으로 돌아가기
-               </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="flex flex-col h-full bg-gray-50">
-        <header className="bg-white p-4 border-b border-gray-100 sticky top-0 z-10 flex justify-center shadow-sm">
-          <h1 className="text-lg font-bold text-gray-900">새로 들어온 주문</h1>
-        </header>
-
-        <div className="p-4 flex flex-col gap-3">
-          {reservations.length > 0 ? (
-            reservations.map(r => (
-              <div key={r.id} onClick={() => setSelectedOrder(r)} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex gap-4 cursor-pointer hover:border-[#FFE400] hover:shadow-md transition-all relative overflow-hidden group">
-                <div className="w-16 h-16 bg-[#FFFBE6] rounded-xl shrink-0 overflow-hidden border border-yellow-100 transition-transform group-hover:scale-105">
-                  <img src={r.imageUrl} alt={r.name} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1 flex flex-col justify-center gap-1">
-                  <div className="flex justify-between items-start">
-                    <div className="font-bold text-[16px] line-clamp-1 leading-snug text-gray-900 pr-2">
-                       {r.name} <span className="text-blue-600 ml-0.5">x{r.quantity}</span>
-                    </div>
-                    <div className="text-[11px] px-2 py-0.5 rounded-full font-bold shrink-0 bg-[#FFE400] text-black shadow-sm tracking-tight">
-                      대기중
-                    </div>
-                  </div>
-                  <div className="text-sm font-bold text-gray-700 flex items-center justify-between">
-                    <span className="flex items-center gap-1"><span className="text-lg leading-none">😎</span> {r.customer}</span>
-                    <span className="text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-md text-xs">{r.time}</span>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-             <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-2">
-                <span className="text-4xl mb-2 grayscale opacity-50">🛍️</span>
-                <span className="font-bold">아직 들어온 주문이 없어요!</span>
-                <span className="text-xs">특가 상품을 등록해 주문을 받아보세요.</span>
-             </div>
-          )}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col h-full bg-gray-50">
@@ -789,11 +688,8 @@ function RegisterPage({ onNavigate }: { onNavigate?: (page: Page) => void }) {
     if (!name || !weight || !price || !quantity || !time || !description) {
       return;
     }
-    if (window.confirm("이대로 등록하시겠습니까?")) {
-      alert("성공적으로 상품이 등록되었습니다!");
-      // 돌아갈 페이지는 뒤로가기 처럼 이전 상태에 따라 분기할 수 있지만, 홈으로 통일하거나 판매페이지로 이동
-      if (onNavigate) onNavigate('home');
-    }
+    alert("성공적으로 상품이 등록되었습니다!");
+    if (onNavigate) onNavigate('home');
   };
 
   const getBorderClass = (val: any) => {
@@ -890,71 +786,7 @@ function RegisterPage({ onNavigate }: { onNavigate?: (page: Page) => void }) {
   )
 }
 
-function MyPage({ onNavigate, userRole }: { onNavigate: (page: Page) => void, userRole?: 'USER' | 'SELLER' }) {
-  if (userRole === 'SELLER') {
-    return (
-      <div className="flex flex-col bg-gray-50 min-h-full">
-        <header className="bg-white p-4 flex items-center sticky top-0 z-10 border-b border-gray-100 shrink-0">
-          <h1 className="font-bold text-lg text-center w-full">가게 관리</h1>
-        </header>
-
-        <div className="flex-1 flex flex-col gap-2 pb-6">
-          {/* Profile Section */}
-          <div className="bg-white p-5 pb-6">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-[#FFE400] rounded-full flex items-center justify-center text-4xl shadow-sm">👨‍🍳</div>
-              <div className="flex flex-col">
-                <span className="font-extrabold text-xl">김살리 사장님 ❯</span>
-                <span className="text-gray-500 text-sm mt-1">망원 정육점</span>
-              </div>
-            </div>
-            
-            <div className="flex justify-around mt-6 pt-5 border-t border-gray-100">
-              <div className="flex flex-col items-center gap-1 cursor-pointer hover:opacity-70 transition-opacity">
-                <span className="text-2xl">📦</span>
-                <span className="text-gray-600 text-xs font-bold">판매중</span>
-                <span className="font-extrabold text-sm">3건</span>
-              </div>
-              <div className="flex flex-col items-center gap-1 cursor-pointer hover:opacity-70 transition-opacity">
-                <span className="text-2xl">🤝</span>
-                <span className="text-gray-600 text-xs font-bold">단골 손님</span>
-                <span className="font-extrabold text-sm">128명</span>
-              </div>
-              <div className="flex flex-col items-center gap-1 cursor-pointer hover:opacity-70 transition-opacity">
-                <span className="text-2xl">⭐</span>
-                <span className="text-gray-600 text-xs font-bold">가게 평점</span>
-                <span className="font-extrabold text-sm">4.8</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white pt-2 border-y border-gray-100 shadow-sm">
-            <MenuList title="가게 관리" items={[
-              { label: '상품 등록/관리', icon: '📝' },
-              { label: '리뷰 관리', icon: '⭐' },
-              { label: '정산 내역', icon: '💰' },
-            ]} />
-          </div>
-
-          <div className="bg-white pt-2 border-y border-gray-100 shadow-sm">
-            <MenuList title="고객센터" items={[
-              { label: '사장님 공지사항', icon: '📢' },
-              { label: '자주 묻는 질문', icon: '❓' },
-              { label: '사장님 만족도 조사', icon: '📋' },
-            ]} />
-          </div>
-
-          <div className="bg-white pt-2 pb-4 border-y border-gray-100 shadow-sm">
-            <MenuList title="설정" items={[
-              { label: '알림 설정', icon: '🔔' },
-              { label: '로그아웃', icon: '🚪', textClass: 'text-red-500', onClick: () => onNavigate('login') },
-            ]} />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+function MyPage({ onNavigate }: { onNavigate: (page: Page) => void }) {
   return (
     <div className="flex flex-col bg-gray-50 min-h-full">
       <header className="bg-white p-4 flex items-center sticky top-0 z-10 border-b border-gray-100 shrink-0">
@@ -1079,12 +911,8 @@ function MenuList({ title, items }: { title: string, items: Array<{label: string
 function BottomTabBar({ currentPage, onNavigate, userRole }: { currentPage: Page, onNavigate: (page: Page) => void, userRole: 'USER' | 'SELLER' }) {
   return (
     <nav className="absolute bottom-0 w-full max-w-[390px] bg-white border-t border-gray-100 flex items-center justify-around h-16 px-2 drop-shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
-      <TabButton icon="🏠" label="홈" isActive={currentPage === 'home' || currentPage === 'seller_home'} onClick={() => onNavigate(userRole === 'SELLER' ? 'seller_home' : 'home')} />
-      {userRole === 'SELLER' ? (
-        <TabButton icon="🛍️" label="판매" isActive={currentPage === 'sales'} onClick={() => onNavigate('sales')} />
-      ) : (
-        <TabButton icon="🗺️" label="근처 지도" isActive={currentPage === 'map'} onClick={() => onNavigate('map')} />
-      )}
+      <TabButton icon="🏠" label="홈" isActive={currentPage === 'home'} onClick={() => onNavigate('home')} />
+      <TabButton icon="🗺️" label="근처 지도" isActive={false} onClick={() => {}} />
       
       {/* Center Action Button */}
       {userRole === 'SELLER' ? (
@@ -1127,259 +955,4 @@ function formatCountdown(targetDate: Date, now: Date) {
   const s = Math.floor((diff / 1000) % 60);
   
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-}
-
-function SellerHomePage() {
-  const [pauseBusiness, setPauseBusiness] = useState(false);
-  const [noticeExpanded, setNoticeExpanded] = useState(false);
-
-  return (
-    <div className="flex flex-col min-h-full bg-gray-50 relative pb-20">
-      {/* Header */}
-      <header className="bg-gray-50 p-4 flex justify-between items-center sticky top-0 z-20 shrink-0 min-h-[64px]">
-        <button className="text-2xl text-gray-800 focus:outline-none flex items-center justify-center p-1 relative -left-1">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="miter"><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
-        </button>
-        <div className="flex items-center gap-1 font-black text-xl tracking-tight text-gray-900 absolute left-1/2 -translate-x-1/2">
-          살리장셀프서비스 <span className="text-[22px] ml-0.5">🥜</span>
-        </div>
-        <div className="w-8"></div> {/* Placeholder to balance the flex space-between */}
-      </header>
-
-      <div className="px-5 py-2 flex flex-col gap-5">
-        {/* Date & Greeting */}
-        <div className="mt-1">
-          <div className="text-gray-500 font-bold mb-1 flex items-center gap-1.5 text-[13px]">
-            <span>2024. 11. 19 (화)</span>
-            <span>·</span>
-            <span>☀️ 20.2°</span>
-          </div>
-          <h2 className="text-[21px] font-black text-gray-900 tracking-tight leading-snug">김살리 사장님을 언제나 응원해요!</h2>
-        </div>
-
-        {/* Expected Deposit */}
-        <div className="bg-[#f2f6ff] rounded-2xl p-5 flex justify-between items-center cursor-pointer transition-colors active:bg-blue-100 mt-2">
-          <span className="font-bold text-[15px] text-gray-800">입금 예정 금액</span>
-          <div className="flex items-center gap-0.5 font-bold text-[18px] text-blue-600">
-            <span>249,180원</span>
-            <span className="text-blue-500 text-xl font-normal ml-0.5">›</span>
-          </div>
-        </div>
-
-        {/* Yesterday's Summary */}
-        <div className="grid grid-cols-2 gap-3 mt-1">
-          <div className="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100/80 cursor-pointer transition-shadow">
-            <div className="text-gray-600 font-bold mb-2.5 text-sm">어제 주문금액</div>
-            <div className="flex items-center justify-between mb-1">
-              <span className="font-extrabold text-[19px] text-gray-900">1,520,180원</span>
-              <span className="text-gray-400 font-light text-xl -mt-1">›</span>
-            </div>
-            <div className="text-emerald-500 font-extrabold text-[13px] tracking-tight">+ 34,000원</div>
-          </div>
-          
-          <div className="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100/80 cursor-pointer transition-shadow">
-            <div className="text-gray-600 font-bold mb-2.5 text-sm">어제 주문수</div>
-            <div className="flex items-center justify-between mb-1">
-              <span className="font-extrabold text-[19px] text-gray-900">21건</span>
-              <span className="text-gray-400 font-light text-xl -mt-1">›</span>
-            </div>
-            <div className="text-orange-500 font-extrabold text-[13px] tracking-tight">- 2건</div>
-          </div>
-        </div>
-
-        {/* Pause Business */}
-        <div className="bg-gray-100/60 rounded-2xl p-5 flex justify-between items-center h-[90px] mt-1 shadow-sm border border-gray-50/50">
-          <div className="flex flex-col gap-1.5 h-full justify-center mt-1">
-            <span className="font-extrabold text-[16px] text-gray-900 leading-none">영업임시중지</span>
-            <span className="text-gray-500 font-bold text-[13px] leading-none tracking-tight">모든 가게에 적용돼요</span>
-          </div>
-          {/* Custom Toggle Switch */}
-          <div 
-            onClick={() => setPauseBusiness(!pauseBusiness)}
-            className={`w-[52px] h-[30px] rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out relative flex items-center ${pauseBusiness ? 'bg-gray-800' : 'bg-gray-300'}`}
-          >
-            <div className={`w-6 h-6 bg-white rounded-full shadow transition-transform duration-200 ease-in-out absolute ${pauseBusiness ? 'translate-x-[22px]' : 'translate-x-0'}`}></div>
-          </div>
-        </div>
-        
-        <div className="h-px bg-gray-200/60 w-full mt-4 mb-1"></div>
-
-        {/* Notices */}
-        <div>
-          <div 
-            className="flex justify-between items-center mb-4 cursor-pointer pt-2"
-            onClick={() => setNoticeExpanded(!noticeExpanded)}
-          >
-            <h3 className="font-extrabold text-[17px] flex items-center gap-1 text-gray-900">공지사항 <span className="text-gray-400 font-light text-[22px] ml-0.5 -mt-1">›</span></h3>
-            <span className="text-gray-500 font-bold text-[13px] flex items-center gap-1 pr-1">펼치기 <span className={`transition-transform duration-300 inline-block font-normal text-[10px] ${noticeExpanded ? 'rotate-180' : ''}`}>▼</span></span>
-          </div>
-          <div className="flex flex-col gap-1 mb-1 px-1">
-            <div className="flex items-start gap-1.5">
-               <span className="text-orange-500 font-black mt-1 text-[22px] leading-[10px]">·</span>
-               <p className="text-gray-700 font-bold text-[14.5px] leading-snug tracking-tight">
-                 [공지] 주문접수채널에서 '라이더 호출' 기능을 사용해보세요
-               </p>
-            </div>
-            <span className="text-gray-400 text-[13px] font-bold mt-1.5 ml-3.5">2025. 1. 31</span>
-          </div>
-          {noticeExpanded && (
-            <div className="mt-4 pt-4 border-t border-gray-100 text-gray-600 text-sm animate-fade-in font-bold px-1">
-              추가 공지사항 내용이 여기에 표시됩니다.
-            </div>
-          )}
-        </div>
-
-        <div className="h-px bg-gray-200/60 w-full mt-5 mb-1"></div>
-
-        {/* Reviews */}
-        <div className="pb-10">
-          <div className="flex items-center gap-3 mb-5 pt-2">
-            <h3 className="font-extrabold text-[17px] flex items-center gap-1 text-gray-900 cursor-pointer">리뷰 <span className="text-gray-400 font-light text-[22px] ml-0.5 -mt-1">›</span></h3>
-            <div className="flex gap-2 text-[12px] font-extrabold tracking-tight">
-              <div className="bg-gray-800 text-white px-2.5 py-1 rounded-full leading-none">신규 3</div>
-              <div className="text-gray-500 flex items-center px-1">미답변 7</div>
-            </div>
-          </div>
-          
-          <div className="flex flex-col gap-1.5 px-1">
-            <div className="flex items-center gap-2">
-              <div className="flex text-[#FFC400] text-[15px] tracking-tighter">
-                ★★★★<span className="text-gray-200">★</span>
-              </div>
-              <span className="text-gray-400 font-bold text-[13px] ml-0.5">오늘</span>
-            </div>
-            <p className="font-bold text-[15px] text-gray-800 mt-1 tracking-tight">서비스로 주신 음료 잘 먹었습니다!</p>
-          </div>
-          
-          <div className="h-px bg-gray-100/80 w-full mt-6 mb-5"></div>
-
-          <div className="flex flex-col gap-1.5 px-1 relative">
-            <div className="flex items-center gap-2">
-              <div className="flex text-[#FFC400] text-[15px] tracking-tighter">
-                ★★★★★
-              </div>
-              <span className="text-gray-400 font-bold text-[13px] ml-0.5">어제</span>
-            </div>
-            <p className="font-bold text-[15px] text-gray-800 mt-1 tracking-tight">고기가 너무 신선해요. 다음에 또 주문할게요!</p>
-            {/* Fade effect at the bottom to mimic scrollable continuing list */}
-            <div className="absolute -bottom-8 w-full h-16 bg-gradient-to-t from-gray-50 to-transparent pointer-events-none"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SalesPage({ onNavigate }: { onNavigate: (page: Page) => void }) {
-  const [products, setProducts] = useState(DUMMY_PRODUCTS.filter(p => ["망원 정육점", "초록 채소가게", "수산 시장"].includes(p.shopName)));
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-
-  if (editingProduct) {
-     return <EditProductView product={editingProduct} onSave={() => { alert('수정되었습니다.'); setEditingProduct(null); }} onCancel={() => setEditingProduct(null)} />
-  }
-
-  const handleDelete = (id: number) => {
-    if (window.confirm("정말 삭제하시겠습니까?")) {
-      setProducts(prev => prev.filter(p => p.id !== id));
-      alert("삭제가 완료되었습니다.");
-    }
-  };
-
-  return (
-    <div className="flex flex-col min-h-full bg-gray-50 pb-20">
-      <header className="bg-white p-4 border-b border-gray-100 sticky top-0 z-10 flex items-center shadow-sm">
-        <button onClick={() => onNavigate('seller_home')} className="w-8 h-8 flex items-center text-xl font-bold">←</button>
-        <h1 className="flex-1 text-lg font-bold text-center pr-8">판매 상품 관리</h1>
-      </header>
-      <div className="p-4 flex flex-col gap-3">
-        {products.map(p => (
-           <div key={p.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex gap-4 items-center">
-             <div className="w-16 h-16 bg-[#FFFBE6] rounded-xl shrink-0 overflow-hidden border border-yellow-100">
-                <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
-             </div>
-             <div className="flex-1 flex flex-col justify-center gap-0.5">
-                <div className="font-bold text-gray-900 text-[15px]">{p.name} <span className="text-xs text-gray-400 font-normal ml-0.5">{p.weight && `(${p.weight})`}</span></div>
-                <div className="text-[14px] font-extrabold text-red-500">{p.discountPrice.toLocaleString()}원 <span className="text-[11px] text-gray-400 line-through font-normal ml-1 pr-1">{p.originalPrice.toLocaleString()}원</span></div>
-                <div className="text-[11px] text-gray-500 font-bold mt-0.5">남은 수량: <span className="text-blue-600 font-extrabold">{p.remaining}개</span> / 총 {p.totalQuantity}개</div>
-             </div>
-             <div className="flex flex-col gap-1.5 shrink-0">
-               <button onClick={() => setEditingProduct(p)} className="px-3 py-1.5 bg-gray-100/80 border border-gray-200 text-gray-700 font-bold rounded-lg text-xs hover:bg-gray-200 active:scale-95 transition-transform w-[72px]">
-                 수정하기
-               </button>
-               <button onClick={() => handleDelete(p.id)} className="px-3 py-1.5 bg-red-50 border border-red-100 text-red-500 font-bold rounded-lg text-xs hover:bg-red-100 active:scale-95 transition-transform w-[72px]">
-                 삭제하기
-               </button>
-             </div>
-           </div>
-        ))}
-        <button onClick={() => onNavigate('register')} className="w-full mt-3 py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-bold flex justify-center items-center gap-2 hover:bg-gray-50 active:scale-95 transition-all">
-          <span className="text-xl">➕</span> 새 마감 특가 등록하기
-        </button>
-      </div>
-    </div>
-  )
-}
-
-function EditProductView({ product, onSave, onCancel }: { product: Product, onSave: () => void, onCancel: () => void }) {
-  const [name, setName] = useState(product.name);
-  const [price, setPrice] = useState(product.originalPrice);
-  const [discountPrice, setDiscountPrice] = useState(product.discountPrice);
-  const [quantity, setQuantity] = useState(product.totalQuantity);
-  const [remaining, setRemaining] = useState(product.remaining);
-
-  return (
-    <div className="flex flex-col bg-gray-50 h-full relative z-20 overflow-y-auto pb-10">
-      <header className="bg-white p-4 border-b border-gray-100 sticky top-0 z-10 flex items-center shadow-sm">
-        <button onClick={onCancel} className="w-8 h-8 flex items-center text-xl font-bold">←</button>
-        <div className="font-bold flex-1 text-center pr-8 text-lg">상품 정보 수정</div>
-      </header>
-      <div className="p-4 flex flex-col gap-5">
-         
-         <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-4">
-           <div className="flex flex-col gap-1.5">
-              <span className="font-bold text-sm text-gray-700">상품명</span>
-              <input type="text" value={name} onChange={e => setName(e.target.value)} className="p-3.5 bg-gray-50 border border-gray-200 rounded-xl font-bold outline-none focus:border-[#FFE400] transition-colors focus:bg-white" />
-           </div>
-           
-           <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <span className="font-bold text-sm text-gray-700">총 수량</span>
-                <div className="relative">
-                  <input type="number" value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl font-bold outline-none text-right pr-8 focus:border-[#FFE400] transition-colors focus:bg-white" />
-                  <span className="absolute right-3 top-3.5 font-bold text-gray-500">개</span>
-                </div>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <span className="font-bold text-sm text-gray-700">잔여 수량</span>
-                <div className="relative">
-                  <input type="number" value={remaining} onChange={e => setRemaining(Number(e.target.value))} className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl font-bold outline-none text-right pr-8 focus:border-[#FFE400] transition-colors focus:bg-white" />
-                  <span className="absolute right-3 top-3.5 font-bold text-gray-500">개</span>
-                </div>
-              </div>
-           </div>
-
-           <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <span className="font-bold text-sm text-gray-700">원래 가격</span>
-                <div className="relative">
-                  <input type="number" value={price} onChange={e => setPrice(Number(e.target.value))} className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl font-bold outline-none text-right pr-8 focus:border-[#FFE400] transition-colors focus:bg-white" />
-                  <span className="absolute right-3 top-3.5 font-bold text-gray-500">원</span>
-                </div>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <span className="font-bold text-sm text-gray-700 text-red-500">마감 할인가</span>
-                <div className="relative">
-                  <input type="number" value={discountPrice} onChange={e => setDiscountPrice(Number(e.target.value))} className="w-full p-3.5 bg-red-50 border border-red-200 rounded-xl font-bold outline-none text-right pr-8 focus:border-red-400 transition-colors text-red-600 focus:bg-white" />
-                  <span className="absolute right-3 top-3.5 font-bold text-red-500">원</span>
-                </div>
-              </div>
-           </div>
-         </div>
-         
-         <button onClick={onSave} className="w-full mt-2 bg-[#FFE400] text-black font-extrabold text-lg py-4 rounded-xl hover:bg-yellow-400 active:scale-95 transition-transform shadow-sm">
-           변경사항 저장
-         </button>
-      </div>
-    </div>
-  )
 }
