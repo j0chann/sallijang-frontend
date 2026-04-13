@@ -26,8 +26,6 @@ export function LoginPage({ onLogin, isPcVersion, onSetPcVersion }: { onLogin: (
               <div className="flex justify-center items-center mt-6 gap-4 font-bold text-sm text-gray-500">
                 <button className="hover:text-black transition-colors">회원가입</button>
                 <div className="w-px h-3 bg-gray-300"></div>
-                <button onClick={() => onLogin('USER')} className="hover:text-black transition-colors">비회원으로 시작하기</button>
-                <div className="w-px h-3 bg-gray-300"></div>
                 <button onClick={() => onSetPcVersion(false)} className="hover:text-black transition-colors text-blue-500 font-black drop-shadow-sm flex items-center gap-1">📱 모바일 버전으로 보기</button>
               </div>
             </div>
@@ -76,8 +74,6 @@ export function LoginPage({ onLogin, isPcVersion, onSetPcVersion }: { onLogin: (
 
         <div className="flex items-center justify-center gap-4 mt-6 text-sm font-bold text-gray-500">
           <button className="hover:text-black transition-colors">회원가입</button>
-          <div className="w-px h-3 bg-gray-300"></div>
-          <button onClick={() => onLogin('USER')} className="hover:text-black transition-colors">비회원으로 시작하기</button>
           <div className="w-px h-3 bg-gray-300"></div>
           <button onClick={() => onSetPcVersion(true)} className="hover:text-black transition-colors text-[#FFE400] font-black drop-shadow-sm flex items-center gap-1">💻 PC 버전으로 보기</button>
         </div>
