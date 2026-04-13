@@ -1,6 +1,6 @@
 ---
 name: team-3 issue template
-about: 3팀 프론트엔드 이슈 템플릿
+about: 3팀 프론트엔드 이슈 템플릿입니다.
 title: "[tag] #issue - title"
 labels: ''
 assignees: ''
@@ -8,9 +8,19 @@ assignees: ''
 ---
 
 <!--
-[tag] issue
+[태그] 이슈번호 - 요약
 형식으로 제목을 작성해주세요
+ -->
 
+## Issue
+<!-- 이슈에 대해 간략하게 설명해주세요 -->
+
+## To-do
+<!-- 진행할 작업에 대해 적어주세요 -->
+- [ ] todo
+
+<!--
+## 태그 분류
 [공통]
 feat: 새로운 기능 추가
 fix: 버그 수정, 장애 대응
@@ -29,10 +39,3 @@ k8s: Kubernetes 매니페스트, Helm, HPA 등
 ci: CI/CD 파이프라인 구성 (GitHub Actions, ArgoCD 등)
 monitor: 모니터링/옵저버빌리티 (Prometheus, Grafana 등)
 -->
-
-## Issue
-<!-- 이슈에 대해 간략하게 설명해주세요 -->
-
-## To-do
-<!-- 진행할 작업에 대해 적어주세요 -->
-- [ ] todo
