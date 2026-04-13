@@ -221,14 +221,6 @@ export function CartPage({ onNavigate, onBack, onOrder }: {
                   <span className="text-base leading-none">+</span> 더 담으러 가기
                 </button>
 
-                {/* 배달 방식 */}
-                <div className="px-5 pb-3 pt-1 border-t border-gray-50 flex items-center gap-1.5">
-                  <span className="font-bold text-[15px] text-gray-900 border-b-2 border-black pb-0.5 cursor-pointer inline-flex items-center gap-1">
-                    배달
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
-                  </span>
-                  <span className="text-[15px] text-gray-600">로 받을게요</span>
-                </div>
 
                 {/* 금액 요약 */}
                 <div className="mx-5 mb-4 pt-3 border-t border-gray-100 flex flex-col gap-2.5">
@@ -236,16 +228,9 @@ export function CartPage({ onNavigate, onBack, onOrder }: {
                     <span>총 주문금액</span>
                     <span className="font-medium text-gray-700">{subtotal.toLocaleString()}원</span>
                   </div>
-                  <div className="flex justify-between text-[14px] text-gray-500">
-                    <div className="flex items-center gap-1.5">
-                      <span>배달팁</span>
-                      <span className="text-[11px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full cursor-pointer font-medium hover:bg-gray-200">자세히</span>
-                    </div>
-                    <span className="font-medium text-gray-700">3,000원</span>
-                  </div>
                   <div className="flex justify-between items-center pt-2.5 border-t border-gray-100">
                     <span className="font-bold text-[16px] text-gray-900">결제예정금액</span>
-                    <span className="font-extrabold text-[20px] text-gray-900">{(subtotal + 3000).toLocaleString()}원</span>
+                    <span className="font-extrabold text-[20px] text-gray-900">{subtotal.toLocaleString()}원</span>
                   </div>
                 </div>
 

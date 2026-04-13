@@ -34,13 +34,11 @@ export function PaymentPage({ product, quantity = 1, cartItems, cartShopName, on
       })).filter(ci => !!ci.product)
     : [];
 
-  // 총 금액 계산
   const totalPrice = isCartMode
     ? resolvedCartItems.reduce((sum, ci) => sum + ci.product.discountPrice * ci.quantity, 0)
     : (product?.discountPrice ?? 0) * quantity;
 
-  const DELIVERY_FEE = isCartMode ? 3000 : 0; // 장바구니는 배달팁 포함
-  const finalPrice = totalPrice + DELIVERY_FEE;
+  const finalPrice = totalPrice; // 픽업 서비스 - 배달팁 없음
   const displayShopName = isCartMode ? cartShopName : product?.shopName;
 
   return (
@@ -112,18 +110,8 @@ export function PaymentPage({ product, quantity = 1, cartItems, cartShopName, on
           )}
 
           {/* 금액 요약 */}
-          <div className="px-5 py-4 border-t border-gray-100 flex flex-col gap-2">
-            <div className="flex justify-between text-sm text-gray-500">
-              <span>상품 금액</span>
-              <span className="font-medium text-gray-700">{totalPrice.toLocaleString()}원</span>
-            </div>
-            {isCartMode && (
-              <div className="flex justify-between text-sm text-gray-500">
-                <span>배달팁</span>
-                <span className="font-medium text-gray-700">{DELIVERY_FEE.toLocaleString()}원</span>
-              </div>
-            )}
-            <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+          <div className="px-5 py-4 border-t border-gray-100">
+            <div className="flex justify-between items-center">
               <span className="font-bold text-gray-800">총 결제금액</span>
               <span className="text-2xl font-black text-gray-900">{finalPrice.toLocaleString()}원</span>
             </div>
